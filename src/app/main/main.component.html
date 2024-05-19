@@ -1,0 +1,21 @@
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="bi bi-stopwatch"></i>
+          <h2 class="card-title">Deadline</h2>
+          <p *ngIf="secondsLeft !== null" class="card-text">
+            Seconds left: {{ secondsLeft }}
+          </p>
+          <button
+            class="btn btn-outline-danger mt-5"
+            (click)="openChangeDeadlineModal()"
+          >
+            Change Deadline
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

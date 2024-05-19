@@ -1,0 +1,10 @@
+.vh-100 {
+    height: 100vh;
+  }
+  
+  .bi-stopwatch {
+    font-size: 36px;
+  }
+  .card {
+    padding: 40px;
+  }
