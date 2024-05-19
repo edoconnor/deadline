@@ -1,4 +1,4 @@
-![Screenshot](assets/screenshot.png)
+![Deadline Screenshot](/src/assets/screenshot.png)
 
 # Angular Deadline Tracker Component
 
