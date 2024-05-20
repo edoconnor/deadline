@@ -1,16 +1,6 @@
 {
   "hosting": {
-    "public": "dist/countdown/browser",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
+    "public": "dist/countdown",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   }
 }

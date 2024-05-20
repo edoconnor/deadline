@@ -1,16 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription, interval } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import { DeadlineService } from '../services/deadline.service';
 import { DeadlineModalComponent } from '../deadline-modal/deadline-modal.component';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
-  styleUrls: ['./main.component.css'], // Corrected the typo here to styleUrls
+  styleUrls: ['./main.component.css'],
 })
 export class MainComponent implements OnInit, OnDestroy {
+  deadlineTime: number | null = null;
   secondsLeft: number | null = null;
   private intervalSubscription: Subscription | null = null;
 
@@ -20,8 +20,15 @@ export class MainComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.getDeadline();
-    this.startCountdown();
+    this.deadlineService.getDeadline().subscribe(
+      (response) => {
+        this.deadlineTime = Date.now() + response.secondsLeft * 1000;
+        this.startCountdown();
+      },
+      (error) => {
+        console.error('Error fetching deadline', error);
+      }
+    );
   }
 
   ngOnDestroy(): void {
@@ -30,28 +37,17 @@ export class MainComponent implements OnInit, OnDestroy {
     }
   }
 
-  getDeadline(): void {
-    this.deadlineService.getDeadline().subscribe(
-      (response) => {
-        this.secondsLeft = response.secondsLeft;
-      },
-      (error) => {
-        console.error('Error fetching deadline', error);
-      }
-    );
-  }
-
   startCountdown(): void {
-    this.intervalSubscription = interval(1000)
-      .pipe(switchMap(() => this.deadlineService.getDeadline()))
-      .subscribe(
-        (response) => {
-          this.secondsLeft = response.secondsLeft;
-        },
-        (error) => {
-          console.error('Error fetching deadline', error);
-        }
-      );
+    this.intervalSubscription = interval(1000).subscribe(() => {
+      if (this.deadlineTime !== null) {
+        this.secondsLeft = Math.max(
+          0,
+          Math.floor((this.deadlineTime - Date.now()) / 1000)
+        );
+      } else {
+        this.secondsLeft = 0;
+      }
+    });
   }
 
   openChangeDeadlineModal(): void {
@@ -64,7 +60,7 @@ export class MainComponent implements OnInit, OnDestroy {
         this.deadlineService.editDeadline(result).subscribe(
           (response) => {
             console.log(response.message);
-            this.getDeadline();
+            this.refreshDeadline();
           },
           (error) => {
             console.error('Error updating deadline', error);
@@ -72,5 +68,17 @@ export class MainComponent implements OnInit, OnDestroy {
         );
       }
     });
+  }
+
+  refreshDeadline(): void {
+    this.deadlineService.getDeadline().subscribe(
+      (response) => {
+        this.deadlineTime = Date.now() + response.secondsLeft * 1000;
+        this.startCountdown();
+      },
+      (error) => {
+        console.error('Error fetching updated deadline', error);
+      }
+    );
   }
 }
